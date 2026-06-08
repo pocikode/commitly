@@ -1,0 +1,59 @@
+version: 2
+
+project_name: opencommit-go
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: oco
+    binary: oco
+    main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/pocikode/opencommit/internal/version.Version={{.Version}}
+      - -X github.com/pocikode/opencommit/internal/version.Commit={{.ShortCommit}}
+      - -X github.com/pocikode/opencommit/internal/version.Date={{.Date}}
+
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+# Homebrew tap is optional (PRD Q5). Uncomment and configure a tap repo to
+# publish a formula on release.
+# brews:
+#   - name: oco
+#     repository:
+#       owner: pocikode
+#       name: homebrew-tap
+#     homepage: https://github.com/pocikode/opencommit-go
+#     description: AI-powered git commit message generator with provider freedom
+#     license: MIT

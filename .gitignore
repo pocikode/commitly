@@ -1,2 +1,18 @@
+# Build artifacts
+/bin/
+/dist/
+/oco
+cover.out
+coverage.txt
+
+# Local config / secrets
+.opencommit.yaml
+
+# Editor / OS
+.DS_Store
+*.swp
+
+# Agents
 /tasks
-/opencommit-original
+!/CLAUDE.md
+!/AGENTS.md

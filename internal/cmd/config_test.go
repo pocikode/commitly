@@ -44,6 +44,19 @@ func TestConfigGetRedactsAPIKey(t *testing.T) {
 	}
 }
 
+func TestRedact(t *testing.T) {
+	cases := map[string]string{
+		"":            "",
+		"ab":          "****",
+		"sk-longsecret": "sk-l****",
+	}
+	for in, want := range cases {
+		if got := redact(in); got != want {
+			t.Errorf("redact(%q) = %q, want %q", in, got, want)
+		}
+	}
+}
+
 func TestConfigSetInvalidPair(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "cfg.yaml")
 	if _, err := execute(t, "config", "set", "noequalsign", "--config", path); err == nil {

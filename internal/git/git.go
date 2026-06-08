@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -56,6 +57,23 @@ func (g *Git) IsRepo(ctx context.Context) bool {
 func (g *Git) Root(ctx context.Context) (string, error) {
 	out, err := g.exec(ctx, "rev-parse", "--show-toplevel")
 	return strings.TrimSpace(out), err
+}
+
+// HooksDir returns the absolute path to the repository's hooks directory.
+func (g *Git) HooksDir(ctx context.Context) (string, error) {
+	out, err := g.exec(ctx, "rev-parse", "--git-path", "hooks")
+	if err != nil {
+		return "", err
+	}
+	dir := strings.TrimSpace(out)
+	if dir == "" {
+		return "", fmt.Errorf("could not resolve git hooks directory")
+	}
+	// git-path may be relative to the work tree; make it absolute.
+	if !filepath.IsAbs(dir) {
+		dir = filepath.Join(g.Dir, dir)
+	}
+	return dir, nil
 }
 
 // StagedFiles returns the paths staged for commit.

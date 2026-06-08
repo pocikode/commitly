@@ -77,28 +77,13 @@ func runCommitFlow(d commitDeps) error {
 		return err
 	}
 
-	ig, err := git.LoadIgnore(d.git.Dir)
+	system, diff, truncated, err := prepareGeneration(d.ctx, d.cfg, d.git)
 	if err != nil {
 		return err
 	}
-	diff, files, err := d.git.DiffFiltered(d.ctx, ig)
-	if err != nil {
-		return err
-	}
-	if len(files) == 0 {
-		return fmt.Errorf("no changes to commit after ignore filtering")
-	}
-
-	diff, truncated := tokens.FitDiff(diff, d.cfg.TokensMaxInput)
 	if truncated {
 		d.ui.Info("warning: diff exceeded token budget and was reduced")
 	}
-
-	override, _, err := prompt.LoadOverride(d.cfg.PromptModule)
-	if err != nil {
-		return err
-	}
-	system := prompt.System(d.cfg, prompt.Options{Override: override})
 
 	message, err := d.generate(system, diff)
 	if err != nil {
@@ -129,6 +114,37 @@ func runCommitFlow(d commitDeps) error {
 			return ErrCancelled
 		}
 	}
+}
+
+// ErrNoFiles signals nothing remained in the diff after ignore filtering.
+var ErrNoFiles = fmt.Errorf("no changes to commit after ignore filtering")
+
+// prepareGeneration builds the system prompt and the (token-budgeted, ignore-
+// filtered) diff for a commit. Shared by the interactive flow and the git hook.
+func prepareGeneration(ctx context.Context, cfg config.Config, g *git.Git) (system, diff string, truncated bool, err error) {
+	ig, err := git.LoadIgnore(g.Dir)
+	if err != nil {
+		return "", "", false, err
+	}
+	d, files, err := g.DiffFiltered(ctx, ig)
+	if err != nil {
+		return "", "", false, err
+	}
+	if len(files) == 0 {
+		return "", "", false, ErrNoFiles
+	}
+
+	d, truncated = tokens.FitDiff(d, cfg.TokensMaxInput)
+
+	override, _, err := prompt.LoadOverride(cfg.PromptModule)
+	if err != nil {
+		return "", "", false, err
+	}
+	system = prompt.System(cfg, prompt.Options{
+		Override:   override,
+		Commitlint: cfg.PromptModule == "@commitlint",
+	})
+	return system, d, truncated, nil
 }
 
 // ensureStaged makes sure there is something staged, offering to stage all when

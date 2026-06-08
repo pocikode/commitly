@@ -57,11 +57,11 @@ func TestSetGetRoundTrip(t *testing.T) {
 func TestSetValidationErrors(t *testing.T) {
 	cfg := Defaults()
 	bad := map[string]string{
-		"ai_provider":      "no-such-provider",
-		"provider_type":    "grpc",
-		"tokens_max_input": "-5",
+		"ai_provider":       "no-such-provider",
+		"provider_type":     "grpc",
+		"tokens_max_input":  "-5",
 		"tokens_max_output": "abc",
-		"emoji":            "maybe",
+		"emoji":             "maybe",
 	}
 	for k, v := range bad {
 		if err := Set(&cfg, k, v); err == nil {

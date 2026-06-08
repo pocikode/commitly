@@ -26,6 +26,9 @@ type Options struct {
 	// Override, when non-empty, replaces the entire built system prompt
 	// (custom prompt module / template).
 	Override string
+	// Commitlint, when true, appends the simplified commitlint rule block so
+	// generated messages pass the project's commit linting.
+	Commitlint bool
 }
 
 // System builds the system prompt from config + options. When an override is
@@ -69,6 +72,10 @@ func System(cfg config.Config, opts Options) string {
 
 	if ctx := strings.TrimSpace(opts.Context); ctx != "" {
 		lines = append(lines, "Additional context provided by the user: <context>"+ctx+"</context>. Consider this context when generating the commit message.")
+	}
+
+	if opts.Commitlint {
+		lines = append(lines, CommitlintRules())
 	}
 
 	return strings.Join(lines, "\n")

@@ -80,6 +80,20 @@ func TestSystemOverride(t *testing.T) {
 	}
 }
 
+func TestSystemCommitlintInjection(t *testing.T) {
+	s := System(config.Defaults(), Options{Commitlint: true})
+	if !strings.Contains(s, "commitlint rules") {
+		t.Error("expected commitlint rules injected")
+	}
+	if !strings.Contains(s, "imperative mood") {
+		t.Error("expected specific commitlint rule")
+	}
+	// Off by default.
+	if strings.Contains(System(config.Defaults(), Options{}), "commitlint rules") {
+		t.Error("commitlint rules should not appear unless enabled")
+	}
+}
+
 func TestClean(t *testing.T) {
 	cases := []struct {
 		name    string

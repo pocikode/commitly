@@ -40,14 +40,14 @@ func TestIgnorePatterns(t *testing.T) {
 	}
 
 	cases := map[string]bool{
-		"foo.snap":            true,  // glob basename
-		"comp/Button.snap":    true,  // glob basename in subdir
-		"dist/bundle.js":      true,  // dir prefix
-		"dist":                true,  // dir exact
-		"secret.txt":          true,  // exact name
-		"src/secret.txt":      true,  // basename match
-		"main.go":             false, // not matched
-		"distinct/file.go":    false, // not under dist/
+		"foo.snap":         true,  // glob basename
+		"comp/Button.snap": true,  // glob basename in subdir
+		"dist/bundle.js":   true,  // dir prefix
+		"dist":             true,  // dir exact
+		"secret.txt":       true,  // exact name
+		"src/secret.txt":   true,  // basename match
+		"main.go":          false, // not matched
+		"distinct/file.go": false, // not under dist/
 	}
 	for p, want := range cases {
 		if got := ig.Match(p); got != want {

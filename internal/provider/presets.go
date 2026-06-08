@@ -74,6 +74,14 @@ func PresetNames() []string {
 	return out
 }
 
+// PresetModels returns the static model list for a named preset, or nil.
+func PresetModels(name string) []string {
+	if p, ok := Preset(name); ok {
+		return p.Models
+	}
+	return nil
+}
+
 // New builds a Provider from resolved config. The base URL falls back to the
 // named preset's URL when api_url is unset. The adapter is chosen by
 // provider_type.

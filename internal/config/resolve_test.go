@@ -1,0 +1,144 @@
+package config
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestGlobalPathPrecedence(t *testing.T) {
+	// Explicit beats env.
+	t.Setenv("OCO_CONFIG_PATH", "/env/path.yaml")
+	p, err := GlobalPath("/explicit/path.yaml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p != "/explicit/path.yaml" {
+		t.Errorf("explicit path = %q", p)
+	}
+
+	// Env beats home default.
+	p, err = GlobalPath("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p != "/env/path.yaml" {
+		t.Errorf("env path = %q", p)
+	}
+}
+
+func TestResolvePrecedence(t *testing.T) {
+	dir := t.TempDir()
+	global := filepath.Join(dir, "global.yaml")
+	if err := os.WriteFile(global, []byte("model: from-global\nemoji: false\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	env := map[string]string{
+		"OCO_MODEL": "from-env",
+	}
+	lookup := func(k string) (string, bool) { v, ok := env[k]; return v, ok }
+
+	cfg, _, err := Resolve(Options{
+		ConfigPath: global,
+		Env:        lookup,
+		Flags:      map[string]string{"model": "from-flag"},
+	})
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	// flag > env > file
+	if cfg.Model != "from-flag" {
+		t.Errorf("model = %q, want from-flag", cfg.Model)
+	}
+}
+
+func TestResolveEnvOverridesFile(t *testing.T) {
+	dir := t.TempDir()
+	global := filepath.Join(dir, "global.yaml")
+	if err := os.WriteFile(global, []byte("model: from-global\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	env := map[string]string{"OCO_MODEL": "from-env"}
+	cfg, _, err := Resolve(Options{
+		ConfigPath: global,
+		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Model != "from-env" {
+		t.Errorf("model = %q, want from-env", cfg.Model)
+	}
+}
+
+func TestResolveInvalidEnvErrors(t *testing.T) {
+	dir := t.TempDir()
+	global := filepath.Join(dir, "global.yaml")
+	if err := os.WriteFile(global, []byte("model: x\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	env := map[string]string{"OCO_TOKENS_MAX_INPUT": "-1"}
+	_, _, err := Resolve(Options{
+		ConfigPath: global,
+		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },
+	})
+	if err == nil {
+		t.Fatal("expected error from invalid env value")
+	}
+}
+
+func TestResolveProjectOverridesGlobal(t *testing.T) {
+	dir := t.TempDir()
+	global := filepath.Join(dir, "global.yaml")
+	if err := os.WriteFile(global, []byte("model: from-global\nemoji: false\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	// Work in a dedicated dir holding a project-local config.
+	projDir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(projDir, ProjectFileName), []byte("model: from-project\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	wd, _ := os.Getwd()
+	t.Cleanup(func() { _ = os.Chdir(wd) })
+	if err := os.Chdir(projDir); err != nil {
+		t.Fatal(err)
+	}
+
+	cfg, _, err := Resolve(Options{
+		ConfigPath: global,
+		Env:        func(string) (string, bool) { return "", false },
+	})
+	if err != nil {
+		t.Fatalf("resolve: %v", err)
+	}
+	// project file overrides global file
+	if cfg.Model != "from-project" {
+		t.Errorf("model = %q, want from-project", cfg.Model)
+	}
+}
+
+func TestProjectPathAbsentReturnsEmpty(t *testing.T) {
+	wd, _ := os.Getwd()
+	t.Cleanup(func() { _ = os.Chdir(wd) })
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
+	if p := ProjectPath(); p != "" {
+		t.Errorf("expected empty project path, got %q", p)
+	}
+}
+
+func TestResolveDefaultsWhenNoFile(t *testing.T) {
+	cfg, _, err := Resolve(Options{
+		ConfigPath: filepath.Join(t.TempDir(), "missing.yaml"),
+		Env:        func(string) (string, bool) { return "", false },
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Model != Defaults().Model {
+		t.Errorf("model = %q, want default", cfg.Model)
+	}
+}

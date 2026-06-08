@@ -3,9 +3,9 @@ package prompt
 import "strings"
 
 // commitlintRules is a simplified, opinionated subset of the common
-// @commitlint/config-conventional ruleset (PRD Q4 default: simplified subset,
-// not JS-config parsing). Injected into the system prompt so generated messages
-// pass typical commit linting.
+// @commitlint/config-conventional ruleset (simplified subset, not JS-config
+// parsing). Injected into the system prompt so generated messages pass typical
+// commit linting.
 var commitlintRules = []string{
 	"The commit message MUST follow these commitlint rules:",
 	"- type must be one of: feat, fix, build, chore, ci, docs, style, refactor, perf, test, revert.",

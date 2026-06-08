@@ -22,26 +22,71 @@ const (
 // metadata (task 3.0); this list only gates config validation.
 var KnownProviders = []string{"openai", "anthropic", "gemini", "ollama", "groq", "custom"}
 
+// Profile is a named bundle of provider/model credentials. Users define several
+// (e.g. "openai", "local-ollama") and switch the active one with
+// `oco config use <name>`. The active profile's fields overlay the top-level
+// provider fields during Resolve.
+type Profile struct {
+	AIProvider   string `yaml:"ai_provider"`
+	ProviderType string `yaml:"provider_type"`
+	APIKey       string `yaml:"api_key"`
+	APIURL       string `yaml:"api_url"`
+	Model        string `yaml:"model"`
+}
+
 // Config is the full set of OpenCommit-Go settings. Field order mirrors the
-// PRD FR18 key list. YAML keys are lowercase snake_case.
+// YAML keys are lowercase snake_case.
 type Config struct {
-	AIProvider                 string            `yaml:"ai_provider"`
-	ProviderType               string            `yaml:"provider_type"`
-	APIKey                     string            `yaml:"api_key"`
-	APIURL                     string            `yaml:"api_url"`
-	Model                      string            `yaml:"model"`
-	APICustomHeaders           map[string]string `yaml:"api_custom_headers"`
-	Proxy                      string            `yaml:"proxy"`
-	TokensMaxInput             int               `yaml:"tokens_max_input"`
-	TokensMaxOutput            int               `yaml:"tokens_max_output"`
-	Description                bool              `yaml:"description"`
-	Emoji                      bool              `yaml:"emoji"`
-	OmitScope                  bool              `yaml:"omit_scope"`
-	OneLineCommit              bool              `yaml:"one_line_commit"`
-	GitPush                    bool              `yaml:"gitpush"`
-	MessageTemplatePlaceholder string            `yaml:"message_template_placeholder"`
-	PromptModule               string            `yaml:"prompt_module"`
-	HookAutoUncomment          bool              `yaml:"hook_auto_uncomment"`
+	AIProvider                 string             `yaml:"ai_provider"`
+	ProviderType               string             `yaml:"provider_type"`
+	APIKey                     string             `yaml:"api_key"`
+	APIURL                     string             `yaml:"api_url"`
+	Model                      string             `yaml:"model"`
+	APICustomHeaders           map[string]string  `yaml:"api_custom_headers"`
+	Proxy                      string             `yaml:"proxy"`
+	TokensMaxInput             int                `yaml:"tokens_max_input"`
+	TokensMaxOutput            int                `yaml:"tokens_max_output"`
+	Description                bool               `yaml:"description"`
+	Emoji                      bool               `yaml:"emoji"`
+	OmitScope                  bool               `yaml:"omit_scope"`
+	OneLineCommit              bool               `yaml:"one_line_commit"`
+	GitPush                    bool               `yaml:"gitpush"`
+	MessageTemplatePlaceholder string             `yaml:"message_template_placeholder"`
+	PromptModule               string             `yaml:"prompt_module"`
+	HookAutoUncomment          bool               `yaml:"hook_auto_uncomment"`
+	ActiveProfile              string             `yaml:"active_profile"`
+	Profiles                   map[string]Profile `yaml:"profiles,omitempty"`
+}
+
+// ProfileFromConfig snapshots the top-level provider fields into a Profile.
+func ProfileFromConfig(c *Config) Profile {
+	return Profile{
+		AIProvider:   c.AIProvider,
+		ProviderType: c.ProviderType,
+		APIKey:       c.APIKey,
+		APIURL:       c.APIURL,
+		Model:        c.Model,
+	}
+}
+
+// ApplyProfile overlays a profile's non-empty provider fields onto the
+// top-level provider fields of cfg.
+func ApplyProfile(cfg *Config, p Profile) {
+	if p.AIProvider != "" {
+		cfg.AIProvider = p.AIProvider
+	}
+	if p.ProviderType != "" {
+		cfg.ProviderType = p.ProviderType
+	}
+	if p.APIKey != "" {
+		cfg.APIKey = p.APIKey
+	}
+	if p.APIURL != "" {
+		cfg.APIURL = p.APIURL
+	}
+	if p.Model != "" {
+		cfg.Model = p.Model
+	}
 }
 
 // Defaults returns a Config populated with the built-in default values. This
@@ -52,7 +97,7 @@ func Defaults() Config {
 		ProviderType:               ProviderTypeOpenAICompatible,
 		APIKey:                     "",
 		APIURL:                     "https://api.openai.com/v1",
-		Model:                      "gpt-4o",
+		Model:                      "gpt-4o-mini",
 		APICustomHeaders:           map[string]string{},
 		Proxy:                      "",
 		TokensMaxInput:             40960,

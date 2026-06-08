@@ -1,6 +1,6 @@
 // Package git wraps the git binary for the operations OpenCommit-Go needs:
 // reading the staged diff, detecting changes, staging, committing, and pushing.
-// It shells out to git rather than using a pure-Go implementation (PRD 7).
+// It shells out to git rather than using a pure-Go implementation.
 package git
 
 import (

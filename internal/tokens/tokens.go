@@ -1,5 +1,5 @@
 // Package tokens provides approximate token estimation and input-budget
-// handling for diffs. Exactness is not critical (PRD 7): we use a ~4
+// handling for diffs. Exactness is not critical: we use a ~4
 // chars/token heuristic to enforce tokens_max_input.
 package tokens
 
@@ -69,10 +69,10 @@ func Truncate(text string, maxTokens int) (string, bool) {
 	return text[:limit] + notice, true
 }
 
-// FitDiff enforces maxTokens on a diff using the default strategy (PRD Q3):
-// keep whole files that fit, dropping later files that would overflow the
-// budget; if even the first file overflows, truncate it. It returns the
-// budget-fitted diff and whether any content was dropped or truncated.
+// FitDiff enforces maxTokens on a diff: keep whole files that fit, dropping
+// later files that would overflow the budget; if even the first file
+// overflows, truncate it. It returns the budget-fitted diff and whether any
+// content was dropped or truncated.
 func FitDiff(diff string, maxTokens int) (string, bool) {
 	if Fits(diff, maxTokens) {
 		return diff, false

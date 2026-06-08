@@ -79,6 +79,11 @@ func Resolve(opts Options) (Config, string, error) {
 		}
 	}
 
+	// Overlay the active profile (resolved from file, then OCO_ACTIVE_PROFILE,
+	// then --active-profile flag) onto the top-level provider fields, before the
+	// per-key env/flag layers so an explicit OCO_MODEL etc. still wins.
+	applyActiveProfile(&cfg, opts)
+
 	if err := applyEnv(&cfg, opts.Env); err != nil {
 		return cfg, globalPath, err
 	}
@@ -90,6 +95,35 @@ func Resolve(opts Options) (Config, string, error) {
 	return cfg, globalPath, nil
 }
 
+// applyActiveProfile selects the effective profile name (file < env < flag) and
+// overlays its fields onto cfg. Unknown names are ignored.
+func applyActiveProfile(cfg *Config, opts Options) {
+	fileActive := cfg.ActiveProfile
+	name := fileActive
+	lookup := opts.Env
+	if lookup == nil {
+		lookup = os.LookupEnv
+	}
+	if v, ok := lookup("OCO_ACTIVE_PROFILE"); ok {
+		name = v
+	}
+	if v, ok := opts.Flags["active_profile"]; ok {
+		name = v
+	}
+	// Prefer the requested name; if it is unknown, fall back to the file's
+	// active profile so an env/flag typo doesn't silently drop credentials.
+	for _, candidate := range []string{name, fileActive} {
+		if candidate == "" {
+			continue
+		}
+		if p, ok := cfg.Profiles[candidate]; ok {
+			cfg.ActiveProfile = candidate
+			ApplyProfile(cfg, p)
+			return
+		}
+	}
+}
+
 // applyEnv overlays OCO_-prefixed env vars onto cfg using the key registry.
 // lookup defaults to os.LookupEnv when nil.
 func applyEnv(cfg *Config, lookup func(string) (string, bool)) error {
@@ -97,6 +131,11 @@ func applyEnv(cfg *Config, lookup func(string) (string, bool)) error {
 		lookup = os.LookupEnv
 	}
 	for _, k := range registry {
+		// active_profile via env is handled (leniently) by applyActiveProfile,
+		// which already ran; re-applying here would reject unknown names.
+		if k.Key == "active_profile" {
+			continue
+		}
 		if v, ok := lookup(k.Env); ok {
 			if err := k.Set(cfg, v); err != nil {
 				return err

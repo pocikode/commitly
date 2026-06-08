@@ -59,6 +59,19 @@ var registry = []KeyDef{
 		Set: func(c *Config, v string) error { c.Model = v; return nil },
 	},
 	{
+		Key: "active_profile", Env: "OCO_ACTIVE_PROFILE",
+		Get: func(c *Config) string { return c.ActiveProfile },
+		Set: func(c *Config, v string) error {
+			if v != "" {
+				if _, ok := c.Profiles[v]; !ok {
+					return fmt.Errorf("unknown profile %q: define it first with the setup wizard (oco config)", v)
+				}
+			}
+			c.ActiveProfile = v
+			return nil
+		},
+	},
+	{
 		Key: "api_custom_headers", Env: "OCO_API_CUSTOM_HEADERS",
 		Get: func(c *Config) string {
 			if len(c.APICustomHeaders) == 0 {

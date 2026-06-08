@@ -47,7 +47,7 @@ changelog:
       - "^test:"
       - "^chore:"
 
-# Homebrew tap is optional (PRD Q5). Uncomment and configure a tap repo to
+# Homebrew tap is optional. Uncomment and configure a tap repo to
 # publish a formula on release.
 # brews:
 #   - name: oco

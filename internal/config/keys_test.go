@@ -6,7 +6,7 @@ import (
 )
 
 func TestKeysCoverAllRegistryEntries(t *testing.T) {
-	// Every PRD FR18 key must be registered.
+	// Every key must be registered.
 	want := []string{
 		"ai_provider", "provider_type", "api_key", "api_url", "model",
 		"api_custom_headers", "proxy", "tokens_max_input", "tokens_max_output",

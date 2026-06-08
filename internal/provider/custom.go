@@ -6,10 +6,9 @@ import (
 )
 
 // Custom is a generic adapter for endpoints that mostly follow the OpenAI or
-// Anthropic shape but need extra request fields or headers. Per PRD Q2 (v1
-// default) it does minimal mapping: it reuses a base shape, merges custom
-// headers, and overlays ExtraBody fields onto the request — no full template
-// engine.
+// Anthropic shape but need extra request fields or headers. In v1 it does
+// minimal mapping: reuses a base shape, merges custom headers, and overlays
+// ExtraBody fields onto the request — no full template engine.
 type Custom struct {
 	Settings
 	// Shape selects the base request/response mapping: "openai_compatible" or

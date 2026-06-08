@@ -39,8 +39,8 @@ type UI interface {
 	Info(message string)
 }
 
-// Select chooses the appropriate UI based on flags and environment, per PRD
-// 6.6: --yes, non-TTY, or NO_COLOR fall back to plain auto-confirm output.
+// Select chooses the appropriate UI based on flags and environment:
+// --yes, non-TTY, or NO_COLOR fall back to plain auto-confirm output.
 func Select(yes bool, out io.Writer) UI {
 	if yes || !isInteractive() {
 		return NewPlain(out, true)

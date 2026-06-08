@@ -24,7 +24,7 @@ type PresetDef struct {
 	Models  []string
 }
 
-// presets is the registry of built-in named providers (PRD FR11).
+// presets is the registry of built-in named providers.
 var presets = map[string]PresetDef{
 	"openai": {
 		Name:    "openai",

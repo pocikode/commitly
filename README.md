@@ -36,7 +36,7 @@ Prebuilt binaries for Linux/macOS/Windows are attached to each
 ## Quick start
 
 ```sh
-# 1. Configure a provider (interactive wizard)
+# 1. Configure a provider (interactive profile manager)
 oco config
 
 # ...or set values directly
@@ -54,9 +54,11 @@ Bare `oco` is an alias for `oco commit`.
 | Command | Description |
 |---|---|
 | `oco` / `oco commit` | Generate a commit message from staged changes and commit. |
-| `oco config` | Interactive setup wizard (no args). |
+| `oco config` | Interactive profile manager (no args): list, add, edit, delete, switch profiles. |
 | `oco config get <KEY>...` | Print config values (`api_key` is redacted). |
 | `oco config set <KEY>=<VALUE>...` | Set and persist config values. |
+| `oco config profiles` (alias `list`) | List saved provider/model profiles; `*` marks active. |
+| `oco config use <NAME>` | Switch the active profile. |
 | `oco models [--set <model>]` | List models for the active provider; select and persist. |
 | `oco hook set` / `oco hook unset` | Install/remove the `prepare-commit-msg` hook. |
 | `oco commitlint` | Show commitlint rules and enable rule injection. |
@@ -81,7 +83,9 @@ Each YAML key maps to an `OCO_`-prefixed env var.
 | `provider_type` | `OCO_PROVIDER_TYPE` | `openai_compatible` | `openai_compatible` or `anthropic_compatible`. |
 | `api_key` | `OCO_API_KEY` | — | Redacted in output; never logged. |
 | `api_url` | `OCO_API_URL` | `https://api.openai.com/v1` | Falls back to the preset URL if empty. |
-| `model` | `OCO_MODEL` | `gpt-4o` | |
+| `model` | `OCO_MODEL` | `gpt-4o-mini` | |
+| `active_profile` | `OCO_ACTIVE_PROFILE` | — | Name of the profile whose provider fields are applied. |
+| `profiles` | — | — | Map of named provider/model bundles (managed by `oco config`). |
 | `api_custom_headers` | `OCO_API_CUSTOM_HEADERS` | `{}` | JSON object of extra headers. |
 | `proxy` | `OCO_PROXY` | — | HTTP(S) proxy URL. |
 | `tokens_max_input` | `OCO_TOKENS_MAX_INPUT` | `40960` | Diff is budget-fitted to this. |
@@ -102,12 +106,62 @@ ai_provider: openai
 provider_type: openai_compatible
 api_url: https://api.openai.com/v1
 api_key: sk-...
-model: gpt-4o
+model: gpt-4o-mini
 tokens_max_input: 40960
 tokens_max_output: 4096
 emoji: false
 gitpush: false
+
+# Multiple provider/model setups; active_profile selects one.
+active_profile: openai-work
+profiles:
+  openai-work:
+    ai_provider: openai
+    provider_type: openai_compatible
+    api_url: https://api.openai.com/v1
+    api_key: sk-...
+    model: gpt-4o
+  ollama-local:
+    ai_provider: ollama
+    provider_type: openai_compatible
+    api_url: http://localhost:11434/v1
+    model: qwen2.5-coder
 ```
+
+## Profiles
+
+A **profile** is a named bundle of provider/model credentials (`ai_provider`,
+`provider_type`, `api_url`, `api_key`, `model`). Define several and switch
+between them — e.g. a cloud model for work and a local Ollama model offline.
+
+Run `oco config` (no args) for the interactive manager:
+
+```
+✨ OpenCommit Profiles
+╭───────────────────────────────────────────────────╮
+│      claude (anthropic/claude-3-5-sonnet-latest)  │
+│  > * ollama-local (ollama/llama3.1)               │
+│      openai-work (openai/gpt-4o)                   │
+╰───────────────────────────────────────────────────╯
+  [a]dd  [e]dit  [d]elete  [enter]use  [q]uit
+```
+
+- `↑`/`↓` (or `j`/`k`) move, `*` marks the active profile
+- **a** add a new profile, **e** edit selected, **d** delete selected
+- **enter** activate the selected profile, **q** quit
+
+The active profile's fields overlay the top-level provider settings when a
+commit runs. Switch non-interactively too:
+
+```sh
+oco config profiles          # list, * marks active
+oco config use ollama-local  # set active profile
+OCO_ACTIVE_PROFILE=claude oco commit   # per-run override
+```
+
+Profile selection precedence: `OCO_ACTIVE_PROFILE` env → `active_profile` in
+the config file. An unknown name falls back to the file's active profile.
+Per-key env/flags (e.g. `OCO_MODEL`) still win over the profile.
 
 ## Providers
 

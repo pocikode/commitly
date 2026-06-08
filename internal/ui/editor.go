@@ -30,7 +30,7 @@ func resolveEditor() string {
 }
 
 // EditMessage edits a commit message. It opens $VISUAL/$EDITOR on a temp file
-// when available (PRD Q1 default: external editor); otherwise it falls back to
+// when available; otherwise it falls back to
 // an inline TUI text area.
 func EditMessage(message string) (string, error) {
 	editor := resolveEditor()

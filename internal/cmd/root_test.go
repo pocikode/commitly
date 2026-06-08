@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"os"
 	"strings"
 	"testing"
 
@@ -56,10 +57,16 @@ func TestGlobalFlagsRegistered(t *testing.T) {
 }
 
 func TestBareCommandDefaultsToCommit(t *testing.T) {
-	// Bare `oco` should route to the commit flow. The stub returns a
-	// "commit: not implemented" error, which proves routing reached runCommit.
+	// Bare `oco` should route to the commit flow. Run in a non-repo dir so the
+	// flow fails fast with a deterministic git error — only runCommit emits
+	// "not a git repository", which proves routing reached it.
+	wd, _ := os.Getwd()
+	t.Cleanup(func() { _ = os.Chdir(wd) })
+	if err := os.Chdir(t.TempDir()); err != nil {
+		t.Fatal(err)
+	}
 	_, err := execute(t)
-	if err == nil || !strings.Contains(err.Error(), "commit:") {
+	if err == nil || !strings.Contains(err.Error(), "not a git repository") {
 		t.Fatalf("bare oco should default to commit, got err: %v", err)
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/pocikode/opencommit/internal/config"
+	"github.com/pocikode/commitly/internal/config"
 )
 
 // press feeds a single key to the model and returns the updated model and

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pocikode/opencommit/internal/version"
+	"github.com/pocikode/commitly/internal/version"
 )
 
 // execute runs the root command with the given args, capturing stdout/stderr.
@@ -30,8 +30,8 @@ func TestVersionFlag(t *testing.T) {
 	if !strings.Contains(out, "v9.9.9") {
 		t.Fatalf("version output missing version string: %q", out)
 	}
-	if !strings.HasPrefix(out, "oco ") {
-		t.Fatalf("version output should start with 'oco ': %q", out)
+	if !strings.HasPrefix(out, "cly ") {
+		t.Fatalf("version output should start with 'cly ': %q", out)
 	}
 }
 
@@ -57,7 +57,7 @@ func TestGlobalFlagsRegistered(t *testing.T) {
 }
 
 func TestBareCommandDefaultsToCommit(t *testing.T) {
-	// Bare `oco` should route to the commit flow. Run in a non-repo dir so the
+	// Bare `cly` should route to the commit flow. Run in a non-repo dir so the
 	// flow fails fast with a deterministic git error — only runCommit emits
 	// "not a git repository", which proves routing reached it.
 	wd, _ := os.Getwd()
@@ -67,7 +67,7 @@ func TestBareCommandDefaultsToCommit(t *testing.T) {
 	}
 	_, err := execute(t)
 	if err == nil || !strings.Contains(err.Error(), "not a git repository") {
-		t.Fatalf("bare oco should default to commit, got err: %v", err)
+		t.Fatalf("bare cly should default to commit, got err: %v", err)
 	}
 }
 

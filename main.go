@@ -1,6 +1,6 @@
 package main
 
-import "github.com/pocikode/opencommit/internal/cmd"
+import "github.com/pocikode/commitly/internal/cmd"
 
 func main() {
 	cmd.Execute()

@@ -9,7 +9,7 @@ import (
 )
 
 // IgnoreFileName is the per-repo ignore list for diff filtering.
-const IgnoreFileName = ".opencommitignore"
+const IgnoreFileName = ".commitlyignore"
 
 // DefaultLockFiles are dependency lock files always excluded from the diff sent
 // to the LLM: large, noisy, and low-signal.
@@ -33,7 +33,7 @@ type Ignore struct {
 	lockFiles map[string]bool
 }
 
-// LoadIgnore builds an Ignore from the repo's .opencommitignore (if present)
+// LoadIgnore builds an Ignore from the repo's .commitlyignore (if present)
 // plus the default lock-file set. A missing ignore file is not an error.
 func LoadIgnore(dir string) (*Ignore, error) {
 	ig := &Ignore{lockFiles: map[string]bool{}}

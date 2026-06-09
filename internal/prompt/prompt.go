@@ -6,7 +6,7 @@ package prompt
 import (
 	"strings"
 
-	"github.com/pocikode/opencommit/internal/config"
+	"github.com/pocikode/commitly/internal/config"
 )
 
 // identity opens the system prompt, framing the model's role.

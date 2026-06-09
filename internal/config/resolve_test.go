@@ -8,7 +8,7 @@ import (
 
 func TestGlobalPathPrecedence(t *testing.T) {
 	// Explicit beats env.
-	t.Setenv("OCO_CONFIG_PATH", "/env/path.yaml")
+	t.Setenv("CLY_CONFIG_PATH", "/env/path.yaml")
 	p, err := GlobalPath("/explicit/path.yaml")
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestResolvePrecedence(t *testing.T) {
 	}
 
 	env := map[string]string{
-		"OCO_MODEL": "from-env",
+		"CLY_MODEL": "from-env",
 	}
 	lookup := func(k string) (string, bool) { v, ok := env[k]; return v, ok }
 
@@ -59,7 +59,7 @@ func TestResolveEnvOverridesFile(t *testing.T) {
 	if err := os.WriteFile(global, []byte("model: from-global\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	env := map[string]string{"OCO_MODEL": "from-env"}
+	env := map[string]string{"CLY_MODEL": "from-env"}
 	cfg, _, err := Resolve(Options{
 		ConfigPath: global,
 		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },
@@ -78,7 +78,7 @@ func TestResolveInvalidEnvErrors(t *testing.T) {
 	if err := os.WriteFile(global, []byte("model: x\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	env := map[string]string{"OCO_TOKENS_MAX_INPUT": "-1"}
+	env := map[string]string{"CLY_TOKENS_MAX_INPUT": "-1"}
 	_, _, err := Resolve(Options{
 		ConfigPath: global,
 		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },
@@ -173,8 +173,8 @@ func TestResolveActiveProfileOverlay(t *testing.T) {
 		t.Errorf("profile a not applied: model=%q url=%q", cfg.Model, cfg.APIURL)
 	}
 
-	// Env OCO_ACTIVE_PROFILE switches to b; flag/env per-key still wins.
-	env := map[string]string{"OCO_ACTIVE_PROFILE": "b"}
+	// Env CLY_ACTIVE_PROFILE switches to b; flag/env per-key still wins.
+	env := map[string]string{"CLY_ACTIVE_PROFILE": "b"}
 	cfg, _, err = Resolve(Options{
 		ConfigPath: global,
 		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },
@@ -191,7 +191,7 @@ func TestResolveActiveProfileOverlay(t *testing.T) {
 	}
 
 	// Unknown active profile is ignored (no overlay, no error).
-	env = map[string]string{"OCO_ACTIVE_PROFILE": "ghost"}
+	env = map[string]string{"CLY_ACTIVE_PROFILE": "ghost"}
 	cfg, _, err = Resolve(Options{
 		ConfigPath: global,
 		Env:        func(k string) (string, bool) { v, ok := env[k]; return v, ok },

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/pocikode/opencommit/internal/config"
+	"github.com/pocikode/commitly/internal/config"
 )
 
 // Provider-type (request-shape) constants. These mirror the config enum values

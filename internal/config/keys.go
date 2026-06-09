@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// KeyDef describes one configuration key: its YAML name, the matching OCO_ env
+// KeyDef describes one configuration key: its YAML name, the matching CLY_ env
 // var, and typed get/set accessors. Set parses + validates the raw string and
 // assigns it to the Config; Get renders the current value as a string.
 type KeyDef struct {
@@ -19,10 +19,10 @@ type KeyDef struct {
 }
 
 // registry is the single source of truth for all configuration keys. Both the
-// env-override resolver and `oco config get/set` are driven by it.
+// env-override resolver and `cly config get/set` are driven by it.
 var registry = []KeyDef{
 	{
-		Key: "ai_provider", Env: "OCO_AI_PROVIDER",
+		Key: "ai_provider", Env: "CLY_AI_PROVIDER",
 		Get: func(c *Config) string { return c.AIProvider },
 		Set: func(c *Config, v string) error {
 			if !contains(KnownProviders, v) {
@@ -33,7 +33,7 @@ var registry = []KeyDef{
 		},
 	},
 	{
-		Key: "provider_type", Env: "OCO_PROVIDER_TYPE",
+		Key: "provider_type", Env: "CLY_PROVIDER_TYPE",
 		Get: func(c *Config) string { return c.ProviderType },
 		Set: func(c *Config, v string) error {
 			if v != ProviderTypeOpenAICompatible && v != ProviderTypeAnthropicCompatible {
@@ -44,27 +44,27 @@ var registry = []KeyDef{
 		},
 	},
 	{
-		Key: "api_key", Env: "OCO_API_KEY",
+		Key: "api_key", Env: "CLY_API_KEY",
 		Get: func(c *Config) string { return c.APIKey },
 		Set: func(c *Config, v string) error { c.APIKey = v; return nil },
 	},
 	{
-		Key: "api_url", Env: "OCO_API_URL",
+		Key: "api_url", Env: "CLY_API_URL",
 		Get: func(c *Config) string { return c.APIURL },
 		Set: func(c *Config, v string) error { c.APIURL = v; return nil },
 	},
 	{
-		Key: "model", Env: "OCO_MODEL",
+		Key: "model", Env: "CLY_MODEL",
 		Get: func(c *Config) string { return c.Model },
 		Set: func(c *Config, v string) error { c.Model = v; return nil },
 	},
 	{
-		Key: "active_profile", Env: "OCO_ACTIVE_PROFILE",
+		Key: "active_profile", Env: "CLY_ACTIVE_PROFILE",
 		Get: func(c *Config) string { return c.ActiveProfile },
 		Set: func(c *Config, v string) error {
 			if v != "" {
 				if _, ok := c.Profiles[v]; !ok {
-					return fmt.Errorf("unknown profile %q: define it first with the setup wizard (oco config)", v)
+					return fmt.Errorf("unknown profile %q: define it first with the setup wizard (cly config)", v)
 				}
 			}
 			c.ActiveProfile = v
@@ -72,7 +72,7 @@ var registry = []KeyDef{
 		},
 	},
 	{
-		Key: "api_custom_headers", Env: "OCO_API_CUSTOM_HEADERS",
+		Key: "api_custom_headers", Env: "CLY_API_CUSTOM_HEADERS",
 		Get: func(c *Config) string {
 			if len(c.APICustomHeaders) == 0 {
 				return "{}"
@@ -92,12 +92,12 @@ var registry = []KeyDef{
 		},
 	},
 	{
-		Key: "proxy", Env: "OCO_PROXY",
+		Key: "proxy", Env: "CLY_PROXY",
 		Get: func(c *Config) string { return c.Proxy },
 		Set: func(c *Config, v string) error { c.Proxy = v; return nil },
 	},
 	{
-		Key: "tokens_max_input", Env: "OCO_TOKENS_MAX_INPUT",
+		Key: "tokens_max_input", Env: "CLY_TOKENS_MAX_INPUT",
 		Get: func(c *Config) string { return strconv.Itoa(c.TokensMaxInput) },
 		Set: func(c *Config, v string) error {
 			n, err := parsePositiveInt("tokens_max_input", v)
@@ -109,7 +109,7 @@ var registry = []KeyDef{
 		},
 	},
 	{
-		Key: "tokens_max_output", Env: "OCO_TOKENS_MAX_OUTPUT",
+		Key: "tokens_max_output", Env: "CLY_TOKENS_MAX_OUTPUT",
 		Get: func(c *Config) string { return strconv.Itoa(c.TokensMaxOutput) },
 		Set: func(c *Config, v string) error {
 			n, err := parsePositiveInt("tokens_max_output", v)
@@ -120,22 +120,22 @@ var registry = []KeyDef{
 			return nil
 		},
 	},
-	boolKey("description", "OCO_DESCRIPTION", func(c *Config) *bool { return &c.Description }),
-	boolKey("emoji", "OCO_EMOJI", func(c *Config) *bool { return &c.Emoji }),
-	boolKey("omit_scope", "OCO_OMIT_SCOPE", func(c *Config) *bool { return &c.OmitScope }),
-	boolKey("one_line_commit", "OCO_ONE_LINE_COMMIT", func(c *Config) *bool { return &c.OneLineCommit }),
-	boolKey("gitpush", "OCO_GITPUSH", func(c *Config) *bool { return &c.GitPush }),
+	boolKey("description", "CLY_DESCRIPTION", func(c *Config) *bool { return &c.Description }),
+	boolKey("emoji", "CLY_EMOJI", func(c *Config) *bool { return &c.Emoji }),
+	boolKey("omit_scope", "CLY_OMIT_SCOPE", func(c *Config) *bool { return &c.OmitScope }),
+	boolKey("one_line_commit", "CLY_ONE_LINE_COMMIT", func(c *Config) *bool { return &c.OneLineCommit }),
+	boolKey("gitpush", "CLY_GITPUSH", func(c *Config) *bool { return &c.GitPush }),
 	{
-		Key: "message_template_placeholder", Env: "OCO_MESSAGE_TEMPLATE_PLACEHOLDER",
+		Key: "message_template_placeholder", Env: "CLY_MESSAGE_TEMPLATE_PLACEHOLDER",
 		Get: func(c *Config) string { return c.MessageTemplatePlaceholder },
 		Set: func(c *Config, v string) error { c.MessageTemplatePlaceholder = v; return nil },
 	},
 	{
-		Key: "prompt_module", Env: "OCO_PROMPT_MODULE",
+		Key: "prompt_module", Env: "CLY_PROMPT_MODULE",
 		Get: func(c *Config) string { return c.PromptModule },
 		Set: func(c *Config, v string) error { c.PromptModule = v; return nil },
 	},
-	boolKey("hook_auto_uncomment", "OCO_HOOK_AUTO_UNCOMMENT", func(c *Config) *bool { return &c.HookAutoUncomment }),
+	boolKey("hook_auto_uncomment", "CLY_HOOK_AUTO_UNCOMMENT", func(c *Config) *bool { return &c.HookAutoUncomment }),
 }
 
 // keyIndex maps key name -> KeyDef for O(1) lookup.

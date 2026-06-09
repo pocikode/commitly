@@ -14,7 +14,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	xterm "github.com/charmbracelet/x/term"
-	"github.com/pocikode/opencommit/internal/config"
+	"github.com/pocikode/commitly/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ func newConfigCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Get or set configuration values",
-		Long:  "Manage OpenCommit-Go configuration. With no subcommand, opens the interactive profile manager.",
+		Long:  "Manage Commitly configuration. With no subcommand, opens the interactive profile manager.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runConfigManager(cmd.InOrStdin(), cmd.OutOrStdout(), flagConfig)
 		},
@@ -129,7 +129,7 @@ func runConfigProfiles(out io.Writer, configPath string) error {
 		return err
 	}
 	if len(cfg.Profiles) == 0 {
-		fmt.Fprintln(out, "No profiles saved. Run `oco config` to create one.")
+		fmt.Fprintln(out, "No profiles saved. Run `cly config` to create one.")
 		return nil
 	}
 	names := make([]string, 0, len(cfg.Profiles))
@@ -161,7 +161,7 @@ func runConfigUse(out io.Writer, configPath, name string) error {
 	}
 	profile, ok := cfg.Profiles[name]
 	if !ok {
-		return fmt.Errorf("unknown profile %q: run `oco config profiles` to list them", name)
+		return fmt.Errorf("unknown profile %q: run `cly config profiles` to list them", name)
 	}
 	cfg.ActiveProfile = name
 	config.ApplyProfile(&cfg, profile)
@@ -193,7 +193,7 @@ const (
 )
 
 // runConfigManager is the interactive profile manager shown by bare
-// `oco config`: it lists saved profiles and lets the user add, edit, delete, or
+// `cly config`: it lists saved profiles and lets the user add, edit, delete, or
 // activate one. On a real terminal it uses a bubbletea key-driven list; for
 // piped/test input it falls back to a line-based menu. Both share one reader so
 // the flow stays scriptable and unit-testable.
@@ -510,7 +510,7 @@ func (m profileTUIModel) View() string {
 		tuiHelpKey.Render("[enter]use") + tuiHelpText.Render("  ") +
 		tuiHelpKey.Render("[q]uit")
 
-	return tuiTitle.Render("✨ OpenCommit Profiles") + "\n" +
+	return tuiTitle.Render("✨ Commitly Profiles") + "\n" +
 		tuiBox.Render(rows.String()) + "\n" +
 		help + "\n"
 }

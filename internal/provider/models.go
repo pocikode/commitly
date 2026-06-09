@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"sort"
 
-	"github.com/pocikode/opencommit/internal/config"
+	"github.com/pocikode/commitly/internal/config"
 )
 
 // FetchModels queries an OpenAI-compatible /models endpoint and returns the

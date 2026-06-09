@@ -1,12 +1,11 @@
-# OpenCommit-Go (`oco`)
+# Commitly (`cly`)
 
 AI-powered git commit message generator — a single static Go binary with
 **provider freedom**. Point it at any OpenAI-compatible or Anthropic-compatible
 endpoint (cloud or self-hosted), or pick a built-in preset. No Node, no Python,
 no vendor lock-in.
 
-This is a Go port of [opencommit](https://github.com/di-sukharev/opencommit).
-See [Credits](#credits).
+Port of [opencommit](https://github.com/di-sukharev/opencommit). See [Credits](#credits).
 
 ## Features
 
@@ -18,88 +17,88 @@ See [Credits](#credits).
 - Optional emoji/gitmoji, one-line mode, body description, and custom prompt
   templates.
 - `prepare-commit-msg` git hook, model picker, and commitlint rule injection.
-- Single YAML config at `~/.opencommit.yaml` with `OCO_`-prefixed env overrides.
+- Single YAML config at `~/.commitly.yaml` with `CLY_`-prefixed env overrides.
 
 ## Install
 
 ```sh
 # From source (requires Go)
-go install github.com/pocikode/opencommit@latest
+go install github.com/pocikode/commitly@latest
 
 # Or build locally
-make build      # produces ./bin/oco
+make build      # produces ./bin/cly
 ```
 
 Prebuilt binaries for Linux/macOS/Windows are attached to each
-[GitHub Release](https://github.com/pocikode/opencommit-go/releases).
+[GitHub Release](https://github.com/pocikode/commitly/releases).
 
 ## Quick start
 
 ```sh
 # 1. Configure a provider (interactive profile manager)
-oco config
+cly config
 
 # ...or set values directly
-oco config set ai_provider=openai api_key=sk-... model=gpt-4o
+cly config set ai_provider=openai api_key=sk-... model=gpt-4o
 
 # 2. Stage changes and generate a commit
 git add .
-oco
+cly
 ```
 
-Bare `oco` is an alias for `oco commit`.
+Bare `cly` is an alias for `cly commit`.
 
 ## Commands
 
 | Command | Description |
 |---|---|
-| `oco` / `oco commit` | Generate a commit message from staged changes and commit. |
-| `oco config` | Interactive profile manager (no args): list, add, edit, delete, switch profiles. |
-| `oco config get <KEY>...` | Print config values (`api_key` is redacted). |
-| `oco config set <KEY>=<VALUE>...` | Set and persist config values. |
-| `oco config profiles` (alias `list`) | List saved provider/model profiles; `*` marks active. |
-| `oco config use <NAME>` | Switch the active profile. |
-| `oco models [--set <model>]` | List models for the active provider; select and persist. |
-| `oco hook set` / `oco hook unset` | Install/remove the `prepare-commit-msg` hook. |
-| `oco commitlint` | Show commitlint rules and enable rule injection. |
-| `oco --version` / `oco --help` | Version and help. |
+| `cly` / `cly commit` | Generate a commit message from staged changes and commit. |
+| `cly config` | Interactive profile manager (no args): list, add, edit, delete, switch profiles. |
+| `cly config get <KEY>...` | Print config values (`api_key` is redacted). |
+| `cly config set <KEY>=<VALUE>...` | Set and persist config values. |
+| `cly config profiles` (alias `list`) | List saved provider/model profiles; `*` marks active. |
+| `cly config use <NAME>` | Switch the active profile. |
+| `cly models [--set <model>]` | List models for the active provider; select and persist. |
+| `cly hook set` / `cly hook unset` | Install/remove the `prepare-commit-msg` hook. |
+| `cly commitlint` | Show commitlint rules and enable rule injection. |
+| `cly --version` / `cly --help` | Version and help. |
 
 Global flags: `--yes/-y` (auto-confirm, non-interactive) and
 `--config <path>` (override config file).
 
 ## Configuration
 
-Config lives at `~/.opencommit.yaml` (override with `OCO_CONFIG_PATH` or
-`--config`). A project-local `.opencommit.yaml` in the repo root overrides the
+Config lives at `~/.commitly.yaml` (override with `CLY_CONFIG_PATH` or
+`--config`). A project-local `.commitly.yaml` in the repo root overrides the
 global file. Precedence, highest to lowest:
 
 > command-line flag → environment variable → project config → global config → built-in default
 
-Each YAML key maps to an `OCO_`-prefixed env var.
+Each YAML key maps to a `CLY_`-prefixed env var.
 
 | YAML key | Env var | Default | Notes |
 |---|---|---|---|
-| `ai_provider` | `OCO_AI_PROVIDER` | `openai` | Preset name or `custom`. |
-| `provider_type` | `OCO_PROVIDER_TYPE` | `openai_compatible` | `openai_compatible` or `anthropic_compatible`. |
-| `api_key` | `OCO_API_KEY` | — | Redacted in output; never logged. |
-| `api_url` | `OCO_API_URL` | `https://api.openai.com/v1` | Falls back to the preset URL if empty. |
-| `model` | `OCO_MODEL` | `gpt-4o-mini` | |
-| `active_profile` | `OCO_ACTIVE_PROFILE` | — | Name of the profile whose provider fields are applied. |
-| `profiles` | — | — | Map of named provider/model bundles (managed by `oco config`). |
-| `api_custom_headers` | `OCO_API_CUSTOM_HEADERS` | `{}` | JSON object of extra headers. |
-| `proxy` | `OCO_PROXY` | — | HTTP(S) proxy URL. |
-| `tokens_max_input` | `OCO_TOKENS_MAX_INPUT` | `40960` | Diff is budget-fitted to this. |
-| `tokens_max_output` | `OCO_TOKENS_MAX_OUTPUT` | `4096` | |
-| `description` | `OCO_DESCRIPTION` | `false` | Add a body explaining WHY. |
-| `emoji` | `OCO_EMOJI` | `false` | Gitmoji prefix. |
-| `omit_scope` | `OCO_OMIT_SCOPE` | `false` | Use `<type>: <subject>`. |
-| `one_line_commit` | `OCO_ONE_LINE_COMMIT` | `false` | Collapse to one line. |
-| `gitpush` | `OCO_GITPUSH` | `false` | Offer to push after commit. |
-| `message_template_placeholder` | `OCO_MESSAGE_TEMPLATE_PLACEHOLDER` | `$msg` | Placeholder for hook templating. |
-| `prompt_module` | `OCO_PROMPT_MODULE` | `conventional-commit` | `@commitlint`, or a path to a prompt file. |
-| `hook_auto_uncomment` | `OCO_HOOK_AUTO_UNCOMMENT` | `false` | Drop template comment lines in the hook. |
+| `ai_provider` | `CLY_AI_PROVIDER` | `openai` | Preset name or `custom`. |
+| `provider_type` | `CLY_PROVIDER_TYPE` | `openai_compatible` | `openai_compatible` or `anthropic_compatible`. |
+| `api_key` | `CLY_API_KEY` | — | Redacted in output; never logged. |
+| `api_url` | `CLY_API_URL` | `https://api.openai.com/v1` | Falls back to the preset URL if empty. |
+| `model` | `CLY_MODEL` | `gpt-4o-mini` | |
+| `active_profile` | `CLY_ACTIVE_PROFILE` | — | Name of the profile whose provider fields are applied. |
+| `profiles` | — | — | Map of named provider/model bundles (managed by `cly config`). |
+| `api_custom_headers` | `CLY_API_CUSTOM_HEADERS` | `{}` | JSON object of extra headers. |
+| `proxy` | `CLY_PROXY` | — | HTTP(S) proxy URL. |
+| `tokens_max_input` | `CLY_TOKENS_MAX_INPUT` | `40960` | Diff is budget-fitted to this. |
+| `tokens_max_output` | `CLY_TOKENS_MAX_OUTPUT` | `4096` | |
+| `description` | `CLY_DESCRIPTION` | `false` | Add a body explaining WHY. |
+| `emoji` | `CLY_EMOJI` | `false` | Gitmoji prefix. |
+| `omit_scope` | `CLY_OMIT_SCOPE` | `false` | Use `<type>: <subject>`. |
+| `one_line_commit` | `CLY_ONE_LINE_COMMIT` | `false` | Collapse to one line. |
+| `gitpush` | `CLY_GITPUSH` | `false` | Offer to push after commit. |
+| `message_template_placeholder` | `CLY_MESSAGE_TEMPLATE_PLACEHOLDER` | `$msg` | Placeholder for hook templating. |
+| `prompt_module` | `CLY_PROMPT_MODULE` | `conventional-commit` | `@commitlint`, or a path to a prompt file. |
+| `hook_auto_uncomment` | `CLY_HOOK_AUTO_UNCOMMENT` | `false` | Drop template comment lines in the hook. |
 
-### Example `~/.opencommit.yaml`
+### Example `~/.commitly.yaml`
 
 ```yaml
 ai_provider: openai
@@ -134,10 +133,10 @@ A **profile** is a named bundle of provider/model credentials (`ai_provider`,
 `provider_type`, `api_url`, `api_key`, `model`). Define several and switch
 between them — e.g. a cloud model for work and a local Ollama model offline.
 
-Run `oco config` (no args) for the interactive manager:
+Run `cly config` (no args) for the interactive manager:
 
 ```
-✨ OpenCommit Profiles
+✨ Commitly Profiles
 ╭───────────────────────────────────────────────────╮
 │      claude (anthropic/claude-3-5-sonnet-latest)  │
 │  > * ollama-local (ollama/llama3.1)               │
@@ -154,23 +153,23 @@ The active profile's fields overlay the top-level provider settings when a
 commit runs. Switch non-interactively too:
 
 ```sh
-oco config profiles          # list, * marks active
-oco config use ollama-local  # set active profile
-OCO_ACTIVE_PROFILE=claude oco commit   # per-run override
+cly config profiles          # list, * marks active
+cly config use ollama-local  # set active profile
+CLY_ACTIVE_PROFILE=claude cly commit   # per-run override
 ```
 
-Profile selection precedence: `OCO_ACTIVE_PROFILE` env → `active_profile` in
+Profile selection precedence: `CLY_ACTIVE_PROFILE` env → `active_profile` in
 the config file. An unknown name falls back to the file's active profile.
-Per-key env/flags (e.g. `OCO_MODEL`) still win over the profile.
+Per-key env/flags (e.g. `CLY_MODEL`) still win over the profile.
 
 ## Providers
 
 ### Presets
 
 ```sh
-oco config set ai_provider=openai    model=gpt-4o
-oco config set ai_provider=anthropic provider_type=anthropic_compatible model=claude-3-5-sonnet-latest
-oco config set ai_provider=groq      model=llama-3.3-70b-versatile
+cly config set ai_provider=openai    model=gpt-4o
+cly config set ai_provider=anthropic provider_type=anthropic_compatible model=claude-3-5-sonnet-latest
+cly config set ai_provider=groq      model=llama-3.3-70b-versatile
 ```
 
 ### Self-hosted / custom endpoint (e.g. Ollama, vLLM, LM Studio)
@@ -178,21 +177,21 @@ oco config set ai_provider=groq      model=llama-3.3-70b-versatile
 Any OpenAI-compatible server works — just set `api_url`:
 
 ```sh
-oco config set ai_provider=ollama api_url=http://localhost:11434/v1 model=qwen2.5-coder
+cly config set ai_provider=ollama api_url=http://localhost:11434/v1 model=qwen2.5-coder
 ```
 
 Custom headers and proxy:
 
 ```sh
-oco config set api_custom_headers='{"X-Org":"acme"}' proxy=http://localhost:8080
+cly config set api_custom_headers='{"X-Org":"acme"}' proxy=http://localhost:8080
 ```
 
 ## Git hook
 
 ```sh
-oco hook set     # install prepare-commit-msg
+cly hook set     # install prepare-commit-msg
 git commit       # message is generated automatically
-oco hook unset   # remove it (only removes the oco-owned hook)
+cly hook unset   # remove it (only removes the cly-owned hook)
 ```
 
 The hook generates non-interactively and degrades gracefully: if generation
@@ -201,8 +200,8 @@ fails it warns and leaves your commit unblocked.
 ## Commitlint
 
 ```sh
-oco config set prompt_module=@commitlint
-oco commitlint   # view the injected rules
+cly config set prompt_module=@commitlint
+cly commitlint   # view the injected rules
 ```
 
 When enabled, a simplified Conventional-Commits rule set is appended to the
@@ -213,7 +212,7 @@ prompt so generated messages pass typical commit linting.
 ```sh
 make test         # run tests
 make cover-check  # enforce >= 80% coverage
-make build        # build ./bin/oco
+make build        # build ./bin/cly
 make smoke        # build + run --version/--help
 ```
 

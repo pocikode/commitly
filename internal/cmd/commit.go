@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/pocikode/opencommit/internal/config"
-	"github.com/pocikode/opencommit/internal/git"
-	"github.com/pocikode/opencommit/internal/prompt"
-	"github.com/pocikode/opencommit/internal/provider"
-	"github.com/pocikode/opencommit/internal/tokens"
-	"github.com/pocikode/opencommit/internal/ui"
+	"github.com/pocikode/commitly/internal/config"
+	"github.com/pocikode/commitly/internal/git"
+	"github.com/pocikode/commitly/internal/prompt"
+	"github.com/pocikode/commitly/internal/provider"
+	"github.com/pocikode/commitly/internal/tokens"
+	"github.com/pocikode/commitly/internal/ui"
 	"github.com/spf13/cobra"
 )
 

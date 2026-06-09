@@ -81,7 +81,7 @@ func TestHookRuntimeDegradesOnError(t *testing.T) {
 	if err := runHookRuntime(context.Background(), &errBuf, msgFile, ""); err != nil {
 		t.Fatalf("hook should degrade gracefully, got %v", err)
 	}
-	if !strings.Contains(errBuf.String(), "oco hook:") {
+	if !strings.Contains(errBuf.String(), "cly hook:") {
 		t.Errorf("expected warning, got %q", errBuf.String())
 	}
 }

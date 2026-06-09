@@ -1,4 +1,4 @@
-# Example .opencommitignore — copy to .opencommitignore in your repo root.
+# Example .commitlyignore — copy to .commitlyignore in your repo root.
 # Paths matched here are excluded from the diff sent to the AI provider.
 # Common dependency lock files are excluded automatically.
 

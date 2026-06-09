@@ -43,7 +43,7 @@ func EditMessage(message string) (string, error) {
 // externalEdit writes message to a temp file, opens it in editor, and returns
 // the edited contents.
 func externalEdit(editor, message string) (string, error) {
-	f, err := os.CreateTemp("", "oco-commit-*.txt")
+	f, err := os.CreateTemp("", "cly-commit-*.txt")
 	if err != nil {
 		return "", err
 	}

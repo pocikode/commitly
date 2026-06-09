@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pocikode/opencommit/internal/config"
-	"github.com/pocikode/opencommit/internal/git"
-	"github.com/pocikode/opencommit/internal/provider"
-	"github.com/pocikode/opencommit/internal/ui"
+	"github.com/pocikode/commitly/internal/config"
+	"github.com/pocikode/commitly/internal/git"
+	"github.com/pocikode/commitly/internal/provider"
+	"github.com/pocikode/commitly/internal/ui"
 )
 
 // --- test doubles ---

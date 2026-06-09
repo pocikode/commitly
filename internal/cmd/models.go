@@ -6,8 +6,8 @@ import (
 	"io"
 
 	"github.com/charmbracelet/huh"
-	"github.com/pocikode/opencommit/internal/config"
-	"github.com/pocikode/opencommit/internal/provider"
+	"github.com/pocikode/commitly/internal/config"
+	"github.com/pocikode/commitly/internal/provider"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +37,7 @@ func runModels(ctx context.Context, out io.Writer, configPath string, noPrompt b
 
 	models := provider.ListModels(ctx, cfg)
 	if len(models) == 0 {
-		return fmt.Errorf("no models available for provider %q; set one with: oco config set model=<name>", cfg.AIProvider)
+		return fmt.Errorf("no models available for provider %q; set one with: cly config set model=<name>", cfg.AIProvider)
 	}
 
 	// Non-interactive set path.

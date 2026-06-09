@@ -1,4 +1,4 @@
-module github.com/pocikode/opencommit
+module github.com/pocikode/commitly
 
 go 1.26.4
 

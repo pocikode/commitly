@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pocikode/opencommit/internal/version"
+	"github.com/pocikode/commitly/internal/version"
 	"github.com/spf13/cobra"
 )
 
@@ -14,27 +14,28 @@ var (
 	flagConfig string
 )
 
-// newRootCmd builds the root `oco` command tree. It is a function (not a
+// newRootCmd builds the root `cly` command tree. It is a function (not a
 // package-level var) so tests can construct a fresh command with isolated flag
 // state on each run.
 func newRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:           "oco",
+		Use:           "cly",
+		Aliases:       []string{"commitly"},
 		Short:         "AI-powered git commit message generator",
-		Long:          "oco (OpenCommit-Go) generates git commit messages from your staged diff using a configurable AI provider.",
+		Long:          "cly (Commitly) generates git commit messages from your staged diff using a configurable AI provider.",
 		Version:       version.String(),
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		// Bare `oco` with no subcommand defaults to commit.
+		// Bare `cly` with no subcommand defaults to commit.
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runCommit(cmd, args)
 		},
 	}
 
 	root.PersistentFlags().BoolVarP(&flagYes, "yes", "y", false, "skip confirmation prompts (auto-confirm)")
-	root.PersistentFlags().StringVar(&flagConfig, "config", "", "path to config file (overrides default and OCO_CONFIG_PATH)")
+	root.PersistentFlags().StringVar(&flagConfig, "config", "", "path to config file (overrides default and CLY_CONFIG_PATH)")
 
-	root.SetVersionTemplate("oco {{.Version}}\n")
+	root.SetVersionTemplate("cly {{.Version}}\n")
 
 	root.AddCommand(
 		newCommitCmd(),

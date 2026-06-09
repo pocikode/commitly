@@ -1,5 +1,5 @@
-// Package config defines the OpenCommit-Go configuration model, its on-disk
-// YAML representation, the key registry (YAML key <-> OCO_ env var), and the
+// Package config defines the Commitly configuration model, its on-disk
+// YAML representation, the key registry (YAML key <-> CLY_ env var), and the
 // precedence resolver (flag > env > project > global > default).
 package config
 
@@ -24,7 +24,7 @@ var KnownProviders = []string{"openai", "anthropic", "gemini", "ollama", "groq",
 
 // Profile is a named bundle of provider/model credentials. Users define several
 // (e.g. "openai", "local-ollama") and switch the active one with
-// `oco config use <name>`. The active profile's fields overlay the top-level
+// `cly config use <name>`. The active profile's fields overlay the top-level
 // provider fields during Resolve.
 type Profile struct {
 	AIProvider   string `yaml:"ai_provider"`
@@ -34,7 +34,7 @@ type Profile struct {
 	Model        string `yaml:"model"`
 }
 
-// Config is the full set of OpenCommit-Go settings. Field order mirrors the
+// Config is the full set of Commitly settings. Field order mirrors the
 // YAML keys are lowercase snake_case.
 type Config struct {
 	AIProvider                 string             `yaml:"ai_provider"`

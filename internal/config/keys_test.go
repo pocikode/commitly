@@ -26,8 +26,8 @@ func TestKeysCoverAllRegistryEntries(t *testing.T) {
 
 func TestEveryKeyHasEnvMapping(t *testing.T) {
 	for _, k := range registry {
-		if !strings.HasPrefix(k.Env, "OCO_") {
-			t.Errorf("key %q env var %q must start with OCO_", k.Key, k.Env)
+		if !strings.HasPrefix(k.Env, "CLY_") {
+			t.Errorf("key %q env var %q must start with CLY_", k.Key, k.Env)
 		}
 	}
 }

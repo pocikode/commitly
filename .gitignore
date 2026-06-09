@@ -1,12 +1,12 @@
 # Build artifacts
 /bin/
 /dist/
-/oco
+/cly
 cover.out
 coverage.txt
 
 # Local config / secrets
-.opencommit.yaml
+.commitly.yaml
 
 # Editor / OS
 .DS_Store

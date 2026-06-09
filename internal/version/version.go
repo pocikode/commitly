@@ -2,7 +2,7 @@ package version
 
 // These values are injected at build time via -ldflags, e.g.:
 //
-//	go build -ldflags "-X github.com/pocikode/opencommit/internal/version.Version=v1.2.3"
+//	go build -ldflags "-X github.com/pocikode/commitly/internal/version.Version=v1.2.3"
 var (
 	// Version is the semantic version of the build.
 	Version = "dev"

@@ -16,7 +16,7 @@ var commitlintRules = []string{
 }
 
 // CommitlintRules returns the simplified commitlint rule block injected into the
-// prompt and shown by `oco commitlint`.
+// prompt and shown by `cly commitlint`.
 func CommitlintRules() string {
 	return strings.Join(commitlintRules, "\n")
 }
